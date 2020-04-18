@@ -1,13 +1,17 @@
-using System;
+﻿﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication.DAL;
-using WebApplication.Models;
+using System.Data.SqlClient;
 
+using System.Globalization;
 
-namespace WebApplication.Controllers
+ using WebApplication.DAL;
+ using WebApplication.Models;
+
+ namespace Task4.Controllers
+
 {
     [ApiController]
     [Route("api/students")]
@@ -20,6 +24,7 @@ namespace WebApplication.Controllers
         {
             _dbService = dbService;
         }
+
         [HttpGet]
         public IActionResult GetStudents(string orderBy)
         {
@@ -83,11 +88,11 @@ namespace WebApplication.Controllers
         [HttpPut("{i}")]
         public IActionResult PutStudent(int i)
         {
-                var s = new Student();
-                s.IndexNumber = $"s{new Random().Next(1, 2000)}";
-                s.FirstName = "Jan";
-                s.LastName = "Kowalski";
-                return Ok(s);
+            var s = new Student();
+            s.IndexNumber = $"s{new Random().Next(1, 2000)}";
+            s.FirstName = "Jan";
+            s.LastName = "Kowalski";
+            return Ok(s);
         }
         [HttpDelete("{id}")]
         public IActionResult DeleteStudent(int i)
