@@ -3,14 +3,16 @@
 using Microsoft.AspNetCore.Mvc;
  using System.Data.SqlClient;
  using WebApplication.DTO;
+using WebApplication.Controllers;
 
- namespace Task5.Controllers
+namespace Task5.Controllers
 {
     [Route("api/enrollments")]
     [ApiController] //implicit model validation
     public class EnrollmentsController : ControllerBase
     {
         [HttpPost(Name = "EnrollStudent")]
+
         public IActionResult EnrollStudent(EnrollStudentRequests request)
         {
 
@@ -78,4 +80,47 @@ using Microsoft.AspNetCore.Mvc;
             return Ok("Success");
         }
     }
- }
+
+    [HttpPost(Name = "PromoteStudent")]
+    public IActionResult PromoteStudent(PromoteStudentResponse response)
+    {
+        PromoteStudentResponse result = new PromoteStudentResponse();
+
+        using (var con = new SqlConnection("[Data Source=db-mssql;Initial Catalog=s19230;Integrated Security=True]"))
+        {
+            using (var com = new SqlCommand())
+            {
+
+                com.Connection = con;
+                com.Parameters.AddWithValue("Semester", response.Semester);
+                com.Parameters.AddWithValue("Studies", response.Studies);
+                com.CommandText = "SELECT * FROM Enrollment e JOIN Studies s ON e.IdStudy=s.IdStudy WHERE e.Semester = @Semester AND s.Name=@Studies; ";
+                con.Open();
+                var transaction = con.BeginTransaction();
+                com.Transaction = transaction;
+
+                var dr = com.ExecuteReader();
+                if (dr.HasRows)
+                {
+                    dr.Close();
+                    com.CommandText = "myproc";
+                    com.CommandType = System.Data.CommandType.StoredProcedure;
+                    com.ExecuteNonQuery();
+
+                    result.Studies = response.Studies;
+                    result.Semester = response.Semester + 1;
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+
+
+            }
+
+        }
+            }
+}
+
+    
